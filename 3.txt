@@ -1,0 +1,10 @@
+Choice of Database - 
+We would be using a NoSQL DB Schema. We provide the justification for using NoSQL as compared to relational databases, NoSQL databases are simple for developers to use, they have flexible data models, scale horizontally, and have exceptionally quick queries. This would help us in ultra-fast querying and yield low response times. 
+
+Rate Limiting - 
+Given 1 million requests per day, we would obtain approximately 416 requests per user per hour, we would perform bucketing using the Token Bucket Algorithm. Buckets would be refreshed for every hour-wise, and we will calculate error percentage for every hour. We would maintain some sort of bucket queue, which would only have the buckets for the past 24 hours. Bucket size would be adjusted user-wise, (for example, maximum could be 416 requests as we expect it to hit that limit), and every API would have a separate index. We would have a load distributer which will take switch and distribute the packet to the corresponding user. Consider a container whose capacity is the total number of tokens it can hold. The consumer must obtain a token from the bucket each time it wants to access an API endpoint. If a token is available, we remove it from the bucket and grant the request. In contrast, if the bucket has no tokens, we refuse the request. Tokens are being consumed by requests, but we are also renewing them at a set rate so that we never go over the bucket's capacity.
+
+To serve the 3 queries - 
+- For the second query, maximum average response time across users will be calculated by using the running average maintained in our bucket table.   
+- For the first query, we will take the maximum of all the entries in the second query per user.
+- For error percentage, since we are refreshing the buckets every hour, we calculate the error in the bucket every hour, and for every API using it's index.
